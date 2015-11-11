@@ -79,6 +79,11 @@ class mmonit(
     mode    => 755,
     ensure  => present
   }
+  
+file { "/opt/mmonit/conf" :
+  ensure => directory,
+  before => File["${bin_path}conf/server.xml"]
+  }
 
   file { "${bin_path}conf/server.xml" :
     content => template("mmonit/server.xml"),
