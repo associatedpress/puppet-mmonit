@@ -61,6 +61,7 @@ class mmonit(
   exec { "download-mmonit-${filename}" :
     command => "wget ${download_url} -O ${filename}",
     cwd => $src_path,
+    path => "/usr/bin/",
     creates => "${src_path}${filename}",
     require => File[$src_path,$bin_path]
   }
@@ -68,7 +69,8 @@ class mmonit(
   exec { "extract-mmonit-${filename}" :
     command   => "tar --strip-components 1 -xzvf ${filename} -C ${bin_path}",
     cwd       => $src_path,
-    unless    => "test -f ${bin_path}bin/mmonit && ${bin_path}bin/mmonit -v | grep ${version}",
+    path => "/bin/",
+    unless    => "/usr/bin/test -f ${bin_path}bin/mmonit && ${bin_path}bin/mmonit -v | grep ${version}",
     require   => Exec["download-mmonit-${filename}"]
   }
 
@@ -76,7 +78,7 @@ class mmonit(
     path    => "/etc/init.d/mmonit",
     content => template("mmonit/mmonit_init"),
     replace => true,
-    mode    => 755,
+    mode    => '755',
     ensure  => present
   }
   
@@ -88,7 +90,7 @@ file { "/opt/mmonit/conf" :
   file { "${bin_path}conf/server.xml" :
     content => template("mmonit/server.xml"),
     replace => true,
-    mode    => 755,
+    mode    => '755',
     ensure  => present,
     notify  => Service["mmonit"]
   }
